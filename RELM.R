@@ -11,6 +11,15 @@ calcActivationFunction <- function(ActivationFunction,tempH){
   )
 }
 
+#' @param obs observed values
+#' @param pred predicted values
+calcMultiLabelAccuracy(obs,pred){
+  label_index_expected <- apply(obs,1,which.max)
+  label_index_actual <- apply(pred,1,which.max)
+  TrainingAccuracy <- sum(label_index_expected == label_index_actual)/
+                    length(label_index_expected)
+}
+
 #' R version of Extreme Learning Machine ,for ELM with random hidden nodes and random hidden neurons 
 #' @usage relm(TrainingData_File, TestingData_File, Elm_Type, NumberofHiddenNeurons, ActivationFunction)
 #'
@@ -138,15 +147,14 @@ relm <- function(TrainingData_File, TestingData_File,sep <- "\t", Elm_Type,
   if (Elm_Type == CLASSIFIER){
     ########## Calculate training & testing classification accuracy
     
-    label_index_expected <- apply(y,1,which.max)
-    label_index_actual <- apply(Y,1,which.max)
-    TrueClassificationRate_Training <- sum(label_index_expected == label_index_actual)
-    TrainingAccuracy=TrueClassificationRate_Training/length(label_index_expected)
-    
-    label_index_expected <- apply(TV.y,1,which.max)
-    label_index_actual <- apply(TY,1,which.max)
-    TrueClassificationRate_Testing <- sum(label_index_expected == label_index_actual)
-    TestingAccuracy=TrueClassificationRate_Training/length(label_index_expected)
-    
+    TrainingAccuracy <- calcMultiLabelAccuracy(y,Y)
+    TestingAccuracy <- calcMultiLabelAccuracy(TV.y,TY)
   }
+  list(predictedValue = TY,
+       TrainingTime = TrainingTime,
+       TestingTime = TestingTime,
+       TrainingAccuracy = TrainingAccuracy,
+       TestingAccuracy = TestingAccuracy
+       )
+
 }
